@@ -16,13 +16,11 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import CssBaseline from "@mui/material/CssBaseline";
 
-// import * from 'fs';
-
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const [mood, setMood] = useState(String)
+  const [mood, setMood] = useState("")
   
   const darkTheme = createTheme({
     palette: {
@@ -37,6 +35,14 @@ function App() {
     setMood(event.target.value as string);
   };
 
+  const handleSave = () => {
+    if (window.electronAPI) {
+      window.electronAPI.saveTextFile("journal.txt", "This is my journal entry.");
+      alert("File saved as journal.txt!");
+    } else {
+      console.error("Electron API is not available");
+    }
+  }
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -72,7 +78,7 @@ function App() {
 
       {/* Section for button to submit journal entry */}
       <div className="card">
-        <Button onClick={() => setCount((count) => count + 1)}>
+        <Button onClick={handleSave}>
           Submit Journal Entry
         </Button>
       </div>
