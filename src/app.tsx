@@ -6,7 +6,7 @@ import { Input, TextField } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from "dayjs";
 
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -21,7 +21,9 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   const [mood, setMood] = useState("")
-  
+  const [date, setDate] = useState(null)
+//   const [date, setDate] = useState<Dayjs | null>(dayjs(new Date())); 
+
   const darkTheme = createTheme({
     palette: {
       mode: "dark",
@@ -37,7 +39,7 @@ function App() {
 
   const handleSave = () => {
     if (window.electronAPI) {
-      window.electronAPI.saveTextFile("journal.txt", "This is my journal entry.");
+      window.electronAPI.saveTextFile("journal.txt", "On " + String(date) + ", my mood was " + mood + ".");
       alert("File saved as journal.txt!");
     } else {
       console.error("Electron API is not available");
@@ -52,7 +54,11 @@ function App() {
       {/* Add section showing today's date */}
       <h3>Choose date for journal entry</h3>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker defaultValue={dayjs(new Date())}/>
+        <DatePicker 
+            value={date} 
+            onChange={(newDate) => setDate(newDate)} 
+            defaultValue={dayjs(new Date())}
+        />
       </LocalizationProvider> 
 
       {/* Add section for mood for today on top, three faces with varying moods to indicate happy, meh, bad */}
