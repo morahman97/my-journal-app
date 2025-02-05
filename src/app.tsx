@@ -19,9 +19,9 @@ import CssBaseline from "@mui/material/CssBaseline";
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
   const [mood, setMood] = useState("")
-  const [date, setDate] = useState(null)
+  var [date, setDate] = useState(null)
+  var [content, setContent] = useState("")
 //   const [date, setDate] = useState<Dayjs | null>(dayjs(new Date())); 
 
   const darkTheme = createTheme({
@@ -33,13 +33,20 @@ function App() {
     }
   })
 
-  const handleChange = (event: SelectChangeEvent) => {
+  const handleMood = (event: SelectChangeEvent) => {
     setMood(event.target.value as string);
+  };
+  
+  const handleContent = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setContent(event.target.value as string);
   };
 
   const handleSave = () => {
+    if (date == null) {
+      date = dayjs(new Date())
+    }
     if (window.electronAPI) {
-      window.electronAPI.saveTextFile("journal.txt", "On " + String(date) + ", my mood was " + mood + ".");
+      window.electronAPI.saveTextFile("journal.txt", "On " + date.format('L') + ", my mood was " + mood + "." + "\n" + content);
       alert("File saved as journal.txt!");
     } else {
       console.error("Electron API is not available");
@@ -66,7 +73,7 @@ function App() {
       <FormControl>
         <Select
           value={mood}
-          onChange={handleChange}
+          onChange={handleMood}
           // renderValue={(selected) => (selected ? selected : "select an option")} // doesnt work
         >
           <MenuItem value={"good"}>Good</MenuItem>
@@ -77,6 +84,8 @@ function App() {
 
       {/* Section for journal text input */}
       <TextField 
+        value={content}
+        onChange={handleContent}
         placeholder='Tell me what happened today!' 
         multiline 
         fullWidth>
