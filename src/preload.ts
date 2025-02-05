@@ -4,4 +4,5 @@ import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("electronAPI", {
   saveTextFile: (filename: string, content: string) => ipcRenderer.send("save-text-file", filename, content),
+  saveJSONFile: (content: any) => ipcRenderer.send("save-json-file", content),
 });

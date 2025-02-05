@@ -23,6 +23,33 @@ ipcMain.on("save-text-file", (event, filename, content) => {
   });
 });
 
+/**
+ * Saves the provided content as a JSON file in the user's Documents folder.
+ *
+ * @param {Electron.IpcMainEvent} event - The IPC event triggering this function (unused).
+ * @param {Record<string, unknown>} content - The JSON object to save, containing date, mood, and content.
+ *
+ * @returns {void} - No return value. Logs success or error to the console.
+ *
+ * @example
+ * ipcMain.on("save-json-file", (event, data) => {
+ *   saveJSONFile(event, data);
+ * });
+ *
+ */
+ipcMain.on("save-json-file", (event, content) => {
+  // Produce file path for journal.json inside user's documents folder
+  const filePath = path.join(app.getPath("documents"), 'journal.json');
+
+  // Convert 
+  fs.writeFile(filePath, JSON.stringify(content, null, 2), "utf-8", (err) => {
+    if (err) {
+      console.error("Failed to save JSON file:", err);
+    } else {
+      console.log("JSON file saved successfully:", filePath);
+    }
+  });
+});
 
 const createWindow = (): void => {
   // Create the browser window.
