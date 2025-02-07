@@ -47,7 +47,12 @@ function App() {
     }
     if (window.electronAPI) {
       // window.electronAPI.saveTextFile("journal.txt", "On " + date.format('L') + ", my mood was " + mood + "." + "\n" + content);
-      var data = {'date': date.format('L'), 'mood': mood, 'content': content}
+      var data = {
+        [date.format('L')]: {
+          'mood': mood, 
+          'content': content
+        }
+      }
       window.electronAPI.saveJSONFile(data)
       alert("File saved!");
     } else {

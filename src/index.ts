@@ -39,9 +39,31 @@ ipcMain.on("save-text-file", (event, filename, content) => {
  */
 ipcMain.on("save-json-file", (event, content) => {
   // Produce file path for journal.json inside user's documents folder
-  const filePath = path.join(app.getPath("documents"), 'journal.json');
+  const filePath = path.join(app.getPath("documents"), "journal.json");
 
-  // Convert 
+  // Read file path to see if file already exists
+  fs.readFile(filePath, "utf-8", (err, data) => {
+    if (err) {
+      console.error("Error reading JSON file:", err);
+      return;
+    }
+    
+    // If file exists, parse the data within
+    try {
+      // If file exists, check if entry exists for date in content
+      const journalData = JSON.parse(data);
+      // entryDate = content['date']
+      // if entryDate in journalData {
+      //   // delete entry for entryDate
+      // }
+      console.log("Journal Data:", journalData);
+    } catch (parseError) {
+      console.error("Error parsing JSON:", parseError);
+    }
+  });
+
+
+  // Convert content to JSON
   fs.writeFile(filePath, JSON.stringify(content, null, 2), "utf-8", (err) => {
     if (err) {
       console.error("Failed to save JSON file:", err);
@@ -49,7 +71,7 @@ ipcMain.on("save-json-file", (event, content) => {
       console.log("JSON file saved successfully:", filePath);
     }
   });
-});
+})
 
 const createWindow = (): void => {
   // Create the browser window.
