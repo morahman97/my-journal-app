@@ -37,40 +37,39 @@ ipcMain.on("save-text-file", (event, filename, content) => {
  * });
  *
  */
-ipcMain.on("save-json-file", (event, content) => {
-  // Produce file path for journal.json inside user's documents folder
-  const filePath = path.join(app.getPath("documents"), "journal.json");
+ipcMain.on("save-json-file", (event, entry) => {
+  console.log(entry)
+  try {
+    // Produce file path for journal.json inside user's documents folder
+    const filePath = path.join(app.getPath("documents"), "journal.json");
+    type JournalType = { [date: string]: {mood: string; content: string}}
+    let journal : JournalType = {};
 
-  // Read file path to see if file already exists
-  fs.readFile(filePath, "utf-8", (err, data) => {
-    if (err) {
-      console.error("Error reading JSON file:", err);
-      return;
-    }
-    
     // If file exists, parse the data within
-    try {
-      // If file exists, check if entry exists for date in content
-      const journalData = JSON.parse(data);
-      // entryDate = content['date']
-      // if entryDate in journalData {
-      //   // delete entry for entryDate
-      // }
-      console.log("Journal Data:", journalData);
-    } catch (parseError) {
-      console.error("Error parsing JSON:", parseError);
+    if (fs.existsSync(filePath)) {
+      // Synchronously read file 
+      const file = fs.readFileSync(filePath,"utf-8");
+      journal = JSON.parse(file) as JournalType;
+      console.log(journal);
     }
-  });
 
+    // Add new entry data to existing journal data // will  cause overwrite if existing date
+    const entryDate = Object.keys(entry)[0];
+    const entryData = entry[entryDate];
+    journal[entryDate] = entryData;
 
-  // Convert content to JSON
-  fs.writeFile(filePath, JSON.stringify(content, null, 2), "utf-8", (err) => {
-    if (err) {
-      console.error("Failed to save JSON file:", err);
-    } else {
-      console.log("JSON file saved successfully:", filePath);
-    }
-  });
+    // Write file with new entry
+    fs.writeFileSync(filePath,JSON.stringify(journal, null, 2));
+    console.log("Wrote content to %s successfully", filePath);
+
+    // Verify file is updated with new entry
+    console.log("Validating:");
+    var newFile = fs.readFileSync(filePath,"utf-8");
+    console.log(JSON.parse(newFile));
+
+  } catch (err) {
+    console.error("Error writing data:", err);
+  }
 })
 
 const createWindow = (): void => {
